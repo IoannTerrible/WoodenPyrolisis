@@ -2,120 +2,184 @@ name: Publish to Factorio Mod Portal
 
 on:
   push:
-    branches:
-      - product
+    branches: [product]
 
 jobs:
-  publish:
+  # ── Read mod metadata from info.json ────────────────────────────────────────
+
+  info:
+    name: Read mod info
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    outputs:
+      name:    ${{ steps.read.outputs.name }}
+      version: ${{ steps.read.outputs.version }}
+      dir:     ${{ steps.read.outputs.dir }}
+      zip:     ${{ steps.read.outputs.zip }}
+      folder:  ${{ steps.read.outputs.folder }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # ── 1. Read mod name and version from info.json ─────────────────────────
-      - name: Read mod info
-        id: info
+      - name: Read info.json
+        id: read
         run: |
           INFO_PATH=$(find . -maxdepth 2 -name "info.json" | head -1)
           MOD_NAME=$(jq -r '.name'    "$INFO_PATH")
           MOD_VER=$(jq  -r '.version' "$INFO_PATH")
           MOD_DIR=$(dirname "$INFO_PATH" | sed 's|^\./||')
-          echo "name=$MOD_NAME"               >> "$GITHUB_OUTPUT"
-          echo "version=$MOD_VER"             >> "$GITHUB_OUTPUT"
-          echo "dir=$MOD_DIR"                 >> "$GITHUB_OUTPUT"
-          echo "zip=${MOD_NAME}_${MOD_VER}.zip" >> "$GITHUB_OUTPUT"
-          echo "folder=${MOD_NAME}_${MOD_VER}"  >> "$GITHUB_OUTPUT"
+          echo "name=$MOD_NAME"                  >> "$GITHUB_OUTPUT"
+          echo "version=$MOD_VER"                >> "$GITHUB_OUTPUT"
+          echo "dir=$MOD_DIR"                    >> "$GITHUB_OUTPUT"
+          echo "zip=${MOD_NAME}_${MOD_VER}.zip"  >> "$GITHUB_OUTPUT"
+          echo "folder=${MOD_NAME}_${MOD_VER}"   >> "$GITHUB_OUTPUT"
+          echo "Mod: $MOD_NAME v$MOD_VER"
 
-      # ── 2. Package: rename folder to canonical form, zip without repo cruft ─
-      - name: Package mod
+  # ── Package the mod into a portal-ready zip ─────────────────────────────────
+
+  package:
+    name: Package mod
+    runs-on: ubuntu-latest
+    needs: info
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rename folder to canonical form
         run: |
-          SRC="${{ steps.info.outputs.dir }}"
-          DST="${{ steps.info.outputs.folder }}"
-          ZIP="${{ steps.info.outputs.zip }}"
-
-          # Rename the mod folder to modname_version if it differs
+          SRC="${{ needs.info.outputs.dir }}"
+          DST="${{ needs.info.outputs.folder }}"
           if [ "$SRC" != "$DST" ]; then
             cp -r "$SRC" "$DST"
+            echo "Renamed: $SRC → $DST"
+          else
+            echo "Folder already canonical: $DST"
           fi
 
-          zip -r "$ZIP" "$DST" \
-            --exclude "*/.git/*"   \
+      - name: Create zip
+        run: |
+          ZIP="${{ needs.info.outputs.zip }}"
+          zip -r "$ZIP" "${{ needs.info.outputs.folder }}" \
+            --exclude "*/.git/*"    \
             --exclude "*/.github/*"
-
           echo "Created $ZIP ($(du -sh "$ZIP" | cut -f1))"
 
-      # ── 3. Upload to Factorio Mod Portal via API v2 ──────────────────────────
-      - name: Upload to Factorio Mod Portal
+      - name: Upload zip as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ needs.info.outputs.zip }}
+          path: ${{ needs.info.outputs.zip }}
+          retention-days: 30
+
+  # ── Upload to Factorio Mod Portal ───────────────────────────────────────────
+
+  publish-portal:
+    name: Publish to Factorio Mod Portal
+    runs-on: ubuntu-latest
+    needs: [info, package]
+    continue-on-error: true
+
+    steps:
+      - name: Download zip artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.info.outputs.zip }}
+
+      - name: Request upload URL
+        id: init
         env:
           FACTORIO_API_KEY: ${{ secrets.FACTORIO_API_KEY }}
         run: |
-          MOD_NAME="${{ steps.info.outputs.name }}"
-          ZIP="${{ steps.info.outputs.zip }}"
+          MOD_NAME="${{ needs.info.outputs.name }}"
+          echo "Initialising upload for: $MOD_NAME v${{ needs.info.outputs.version }}"
 
-          echo "Initialising upload for mod: $MOD_NAME v${{ steps.info.outputs.version }}"
-
-          # Step A – obtain a one-time upload URL
           RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
             -H "Authorization: Bearer $FACTORIO_API_KEY" \
             -F "mod=$MOD_NAME" \
             https://mods.factorio.com/api/v2/mods/releases/init_upload)
 
-          HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
-          BODY=$(echo "$RESPONSE" | grep -v "HTTP_STATUS:")
-
-          echo "init_upload → HTTP $HTTP_STATUS"
+          STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
+          BODY=$(echo   "$RESPONSE" | grep -v "HTTP_STATUS:")
+          echo "init_upload → HTTP $STATUS"
           echo "$BODY"
 
-          if [ "$HTTP_STATUS" != "200" ]; then
-            echo "ERROR: init_upload failed — see response above."
+          if [ "$STATUS" != "200" ]; then
+            echo "ERROR: init_upload failed."
             exit 1
           fi
 
           UPLOAD_URL=$(echo "$BODY" | jq -r '.upload_url')
-
           if [ -z "$UPLOAD_URL" ] || [ "$UPLOAD_URL" = "null" ]; then
             echo "ERROR: upload_url missing in response."
             exit 1
           fi
 
-          # Step B – upload the zip to the returned URL
+          echo "upload_url=$UPLOAD_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Upload zip to portal
+        run: |
+          ZIP="${{ needs.info.outputs.zip }}"
+          VERSION="${{ needs.info.outputs.version }}"
+
           RESULT=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
             -F "file=@$ZIP" \
-            "$UPLOAD_URL")
+            "${{ steps.init.outputs.upload_url }}")
 
-          HTTP_STATUS2=$(echo "$RESULT" | grep "HTTP_STATUS:" | cut -d: -f2)
-          BODY2=$(echo "$RESULT" | grep -v "HTTP_STATUS:")
+          STATUS=$(echo "$RESULT" | grep "HTTP_STATUS:" | cut -d: -f2)
+          BODY=$(echo   "$RESULT" | grep -v "HTTP_STATUS:")
+          echo "file upload → HTTP $STATUS"
+          echo "$BODY"
 
-          echo "file upload → HTTP $HTTP_STATUS2"
-          echo "$BODY2"
-
-          if [ "$HTTP_STATUS2" != "200" ]; then
-            if echo "$BODY2" | grep -q "already exists"; then
-              echo "SKIP: version ${{ steps.info.outputs.version }} already exists on the portal. Bump the version before pushing to product."
+          if [ "$STATUS" != "200" ]; then
+            if echo "$BODY" | grep -q "already exists"; then
+              echo "SKIP: v$VERSION already exists on portal. Run the bump workflow before pushing to product."
             else
-              echo "ERROR: file upload failed — see response above."
+              echo "ERROR: upload failed — see response above."
             fi
             exit 1
           fi
 
-      # ── 4. Create GitHub Release and attach the zip ─────────────────────────
-      - name: Create GitHub Release
-        if: always()
+          echo "Successfully published v$VERSION to Factorio Mod Portal."
+
+  # ── Create GitHub Release with zip attached ─────────────────────────────────
+
+  github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [info, package]
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download zip artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.info.outputs.zip }}
+
+      - name: Extract changelog notes
+        id: notes
+        run: |
+          VERSION="${{ needs.info.outputs.version }}"
+          CHANGELOG="${{ needs.info.outputs.dir }}/changelog.txt"
+          NOTES=$(awk "/^Version: ${VERSION}/{found=1; next} found && /^---/{exit} found{print}" \
+            "$CHANGELOG" | sed '/^$/d')
+          echo "notes=${NOTES:-Release v${VERSION}}" >> "$GITHUB_OUTPUT"
+
+      - name: Create release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION="${{ steps.info.outputs.version }}"
-          ZIP="${{ steps.info.outputs.zip }}"
+          VERSION="${{ needs.info.outputs.version }}"
+          ZIP="${{ needs.info.outputs.zip }}"
           TAG="v${VERSION}"
-
-          # Extract changelog block for this version as release notes
-          NOTES=$(awk "/^Version: ${VERSION}/{found=1; next} found && /^---/{exit} found{print}" \
-            "${{ steps.info.outputs.dir }}/changelog.txt" | sed '/^$/d')
 
           gh release create "$TAG" "$ZIP" \
             --title "$TAG" \
-            --notes "${NOTES:-Release $TAG}" \
+            --notes "${{ steps.notes.outputs.notes }}" \
             --latest
+
+          echo "GitHub Release $TAG created."
