@@ -1,0 +1,85 @@
+name: Publish to Factorio Mod Portal
+
+on:
+  push:
+    branches:
+      - product
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 1. Read mod name and version from info.json ─────────────────────────
+      - name: Read mod info
+        id: info
+        run: |
+          INFO_PATH=$(find . -maxdepth 2 -name "info.json" | head -1)
+          MOD_NAME=$(jq -r '.name'    "$INFO_PATH")
+          MOD_VER=$(jq  -r '.version' "$INFO_PATH")
+          MOD_DIR=$(dirname "$INFO_PATH" | sed 's|^\./||')
+          echo "name=$MOD_NAME"               >> "$GITHUB_OUTPUT"
+          echo "version=$MOD_VER"             >> "$GITHUB_OUTPUT"
+          echo "dir=$MOD_DIR"                 >> "$GITHUB_OUTPUT"
+          echo "zip=${MOD_NAME}_${MOD_VER}.zip" >> "$GITHUB_OUTPUT"
+          echo "folder=${MOD_NAME}_${MOD_VER}"  >> "$GITHUB_OUTPUT"
+
+      # ── 2. Package: rename folder to canonical form, zip without repo cruft ─
+      - name: Package mod
+        run: |
+          SRC="${{ steps.info.outputs.dir }}"
+          DST="${{ steps.info.outputs.folder }}"
+          ZIP="${{ steps.info.outputs.zip }}"
+
+          # Rename the mod folder to modname_version if it differs
+          if [ "$SRC" != "$DST" ]; then
+            cp -r "$SRC" "$DST"
+          fi
+
+          zip -r "$ZIP" "$DST" \
+            --exclude "*/.git/*"   \
+            --exclude "*/.github/*"
+
+          echo "Created $ZIP ($(du -sh "$ZIP" | cut -f1))"
+
+      # ── 3. Upload to Factorio Mod Portal via API v2 ──────────────────────────
+      - name: Upload to Factorio Mod Portal
+        env:
+          FACTORIO_API_KEY: ${{ secrets.FACTORIO_API_KEY }}
+        run: |
+          MOD_NAME="${{ steps.info.outputs.name }}"
+          ZIP="${{ steps.info.outputs.zip }}"
+
+          echo "Initialising upload for mod: $MOD_NAME v${{ steps.info.outputs.version }}"
+
+          # Step A – obtain a one-time upload URL
+          RESPONSE=$(curl -sf \
+            -H "Authorization: Bearer $FACTORIO_API_KEY" \
+            -F "mod=$MOD_NAME" \
+            https://mods.factorio.com/api/v2/mods/releases/init_upload)
+
+          UPLOAD_URL=$(echo "$RESPONSE" | jq -r '.upload_url')
+
+          if [ -z "$UPLOAD_URL" ] || [ "$UPLOAD_URL" = "null" ]; then
+            echo "Failed to get upload URL. Portal response:"
+            echo "$RESPONSE"
+            exit 1
+          fi
+
+          # Step B – upload the zip to the returned URL
+          RESULT=$(curl -sf \
+            -F "file=@$ZIP" \
+            "$UPLOAD_URL")
+
+          echo "Portal response: $RESULT"
+
+      # ── 4. Keep the zip as a build artifact for traceability ─────────────────
+      - name: Upload zip as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.info.outputs.zip }}
+          path: ${{ steps.info.outputs.zip }}
+          retention-days: 30
