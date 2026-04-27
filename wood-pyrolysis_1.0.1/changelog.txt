@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.1
+Date: 2026-04-27
+  Bugfixes:
+    - Fixed wood-pyrolysis recipe icon not appearing in game (icon_size was 128, image is 1254x1254).
+    - Fixed pyrolysis-oil fluid icon size mismatch after image was resized to 298x298.
+    - Fixed methanol-solid-fuel icon being cropped — image was non-square (77x96), padded to 96x96.
+---------------------------------------------------------------------------------------------------
 Version: 1.0.0
 Date: 2026-04-27
   Features:
