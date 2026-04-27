@@ -93,7 +93,11 @@ jobs:
           echo "$BODY2"
 
           if [ "$HTTP_STATUS2" != "200" ]; then
-            echo "ERROR: file upload failed — see response above."
+            if echo "$BODY2" | grep -q "already exists"; then
+              echo "SKIP: version ${{ steps.info.outputs.version }} already exists on the portal. Bump the version before pushing to product."
+            else
+              echo "ERROR: file upload failed — see response above."
+            fi
             exit 1
           fi
 
