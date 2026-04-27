@@ -103,6 +103,7 @@ jobs:
 
       # ── 4. Create GitHub Release and attach the zip ─────────────────────────
       - name: Create GitHub Release
+        if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
