@@ -56,25 +56,44 @@ jobs:
           echo "Initialising upload for mod: $MOD_NAME v${{ steps.info.outputs.version }}"
 
           # Step A – obtain a one-time upload URL
-          RESPONSE=$(curl -sf \
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
             -H "Authorization: Bearer $FACTORIO_API_KEY" \
             -F "mod=$MOD_NAME" \
             https://mods.factorio.com/api/v2/mods/releases/init_upload)
 
-          UPLOAD_URL=$(echo "$RESPONSE" | jq -r '.upload_url')
+          HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
+          BODY=$(echo "$RESPONSE" | grep -v "HTTP_STATUS:")
+
+          echo "init_upload → HTTP $HTTP_STATUS"
+          echo "$BODY"
+
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "ERROR: init_upload failed — see response above."
+            exit 1
+          fi
+
+          UPLOAD_URL=$(echo "$BODY" | jq -r '.upload_url')
 
           if [ -z "$UPLOAD_URL" ] || [ "$UPLOAD_URL" = "null" ]; then
-            echo "Failed to get upload URL. Portal response:"
-            echo "$RESPONSE"
+            echo "ERROR: upload_url missing in response."
             exit 1
           fi
 
           # Step B – upload the zip to the returned URL
-          RESULT=$(curl -sf \
+          RESULT=$(curl -s -w "\nHTTP_STATUS:%{http_code}" \
             -F "file=@$ZIP" \
             "$UPLOAD_URL")
 
-          echo "Portal response: $RESULT"
+          HTTP_STATUS2=$(echo "$RESULT" | grep "HTTP_STATUS:" | cut -d: -f2)
+          BODY2=$(echo "$RESULT" | grep -v "HTTP_STATUS:")
+
+          echo "file upload → HTTP $HTTP_STATUS2"
+          echo "$BODY2"
+
+          if [ "$HTTP_STATUS2" != "200" ]; then
+            echo "ERROR: file upload failed — see response above."
+            exit 1
+          fi
 
       # ── 4. Keep the zip as a build artifact for traceability ─────────────────
       - name: Upload zip as artifact
