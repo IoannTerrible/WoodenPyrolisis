@@ -8,6 +8,8 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -95,10 +97,20 @@ jobs:
             exit 1
           fi
 
-      # ── 4. Keep the zip as a build artifact for traceability ─────────────────
-      - name: Upload zip as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.info.outputs.zip }}
-          path: ${{ steps.info.outputs.zip }}
-          retention-days: 30
+      # ── 4. Create GitHub Release and attach the zip ─────────────────────────
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.info.outputs.version }}"
+          ZIP="${{ steps.info.outputs.zip }}"
+          TAG="v${VERSION}"
+
+          # Extract changelog block for this version as release notes
+          NOTES=$(awk "/^Version: ${VERSION}/{found=1; next} found && /^---/{exit} found{print}" \
+            "${{ steps.info.outputs.dir }}/changelog.txt" | sed '/^$/d')
+
+          gh release create "$TAG" "$ZIP" \
+            --title "$TAG" \
+            --notes "${NOTES:-Release $TAG}" \
+            --latest
