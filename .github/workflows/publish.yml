@@ -21,13 +21,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Read info.json
+      - name: Read VERSION and mod name
         id: read
         run: |
-          INFO_PATH=$(find . -maxdepth 2 -name "info.json" | head -1)
-          MOD_NAME=$(jq -r '.name'    "$INFO_PATH")
-          MOD_VER=$(jq  -r '.version' "$INFO_PATH")
-          MOD_DIR=$(dirname "$INFO_PATH" | sed 's|^\./||')
+          MOD_VER=$(cat VERSION | tr -d '[:space:]')
+          MOD_NAME=$(jq -r '.name' "$(find . -maxdepth 2 -name "info.json" | head -1)")
+          MOD_DIR=$(find . -maxdepth 1 -type d -name "${MOD_NAME}_*" | head -1 | sed 's|^\./||')
           echo "name=$MOD_NAME"                  >> "$GITHUB_OUTPUT"
           echo "version=$MOD_VER"                >> "$GITHUB_OUTPUT"
           echo "dir=$MOD_DIR"                    >> "$GITHUB_OUTPUT"
