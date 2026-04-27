@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 2026-04-27
+  Features:
+    - Wood Pyrolysis recipe: converts wood into biochar, pyrolysis oil, and wood gas in a Chemical Plant.
+    - Fischer-Tropsch Synthesis recipe: converts wood gas into light oil, petroleum gas, and water in an Oil Refinery.
+    - Bio-Oil Distillation recipe: fractionates pyrolysis oil into heavy oil, methanol, and water in an Oil Refinery.
+    - Bakelite Synthesis recipe: converts methanol and coal into plastic bars in a Chemical Plant.
+    - Methanol-to-Fuel recipe: converts methanol into solid fuel in a Chemical Plant.
+    - Three new fluids: Pyrolysis Oil, Wood Gas, Methanol.
+    - New item: Biochar (solid fuel, 4 MJ, alternative to coal).
+    - Cryogenic Plant (Space Age) support for wood-pyrolysis and Fischer-Tropsch categories.

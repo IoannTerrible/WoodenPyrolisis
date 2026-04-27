@@ -1,0 +1,9 @@
+{
+  "name": "wood-pyrolysis",
+  "version": "1.0.0",
+  "title": "Wood Pyrolysis",
+  "author": "The_LL",
+  "factorio_version": "2.0",
+  "dependencies": ["base >= 2.0"],
+  "description": "Adds a historically-grounded wood pyrolysis processing chain as an early-game alternative to petroleum. Thermally decompose wood into Biochar, Pyrolysis Oil, and Wood Gas, then refine them further via Fischer-Tropsch Synthesis and Bio-Oil Distillation to obtain light oil, heavy oil, and methanol. Methanol can be converted into plastic bars (Bakelite Synthesis) or solid fuel. All recipes fit naturally into the vanilla Chemical Plant and Oil Refinery pipeline, with optional Cryogenic Plant support for Space Age."
+}

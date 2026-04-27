@@ -1,0 +1,44 @@
+data:extend({
+  {
+    type = "fluid",
+    name = "pyrolysis-oil",
+    icon = "__wood-pyrolysis__/graphics/icons/fluid/pyrolysis-oil.png",
+    icon_size = 207,  -- source image is 207x298 (non-square); Factorio scales to fit
+    subgroup = "fluid",
+    order = "a[fluid]-z[pyrolysis-oil]",
+    default_temperature = 25,
+    max_temperature = 100,
+    base_color = {r = 0.25, g = 0.12, b = 0.03},
+    flow_color = {r = 0.45, g = 0.25, b = 0.08},
+  },
+  {
+    type = "fluid",
+    name = "wood-gas",
+    icons = {
+      {
+        icon = "__base__/graphics/icons/fluid/petroleum-gas.png",
+        icon_size = 64,
+        tint = {r = 0.60, g = 0.62, b = 0.45, a = 1.0},
+      },
+    },
+    subgroup = "fluid",
+    order = "a[fluid]-z[wood-gas]",
+    default_temperature = 25,
+    max_temperature = 100,
+    base_color = {r = 0.42, g = 0.43, b = 0.32},
+    flow_color = {r = 0.65, g = 0.67, b = 0.50},
+    gas_temperature = 25,
+  },
+  {
+    type = "fluid",
+    name = "methanol",
+    icon = "__wood-pyrolysis__/graphics/icons/fluid/methanol.png",
+    icon_size = 1254,
+    subgroup = "fluid",
+    order = "a[fluid]-z[methanol]",
+    default_temperature = 25,
+    max_temperature = 100,
+    base_color = {r = 0.90, g = 0.88, b = 0.68},
+    flow_color = {r = 1.00, g = 0.98, b = 0.82},
+  },
+})
