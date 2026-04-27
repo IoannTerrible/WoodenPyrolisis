@@ -3,7 +3,7 @@ data:extend({
     type = "fluid",
     name = "pyrolysis-oil",
     icon = "__wood-pyrolysis__/graphics/icons/fluid/pyrolysis-oil.png",
-    icon_size = 207,  -- source image is 207x298 (non-square); Factorio scales to fit
+    icon_size = 298,
     subgroup = "fluid",
     order = "a[fluid]-z[pyrolysis-oil]",
     default_temperature = 25,

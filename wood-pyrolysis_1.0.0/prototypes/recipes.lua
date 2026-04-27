@@ -3,7 +3,7 @@ data:extend({
     type = "recipe",
     name = "wood-pyrolysis",
     icon = "__wood-pyrolysis__/graphics/icons/wood-pyrolysis.png",
-    icon_size = 128,
+    icon_size = 1254,
     category = "wood-pyrolysis-process",
     enabled = true,
     energy_required = 5,
@@ -106,7 +106,7 @@ data:extend({
     type = "recipe",
     name = "methanol-solid-fuel",
     icon = "__wood-pyrolysis__/graphics/icons/methanol-solid-fuel.png",
-    icon_size = 77,  -- source image is 77x96 (non-square); Factorio scales to fit
+    icon_size = 96,
     category = "chemistry",
     enabled = true,
     energy_required = 3,
