@@ -167,7 +167,11 @@ jobs:
           CHANGELOG="${{ needs.info.outputs.dir }}/changelog.txt"
           NOTES=$(awk "/^Version: ${VERSION}/{found=1; next} found && /^---/{exit} found{print}" \
             "$CHANGELOG" | sed '/^$/d')
-          echo "notes=${NOTES:-Release v${VERSION}}" >> "$GITHUB_OUTPUT"
+          {
+            echo "notes<<__EOF__"
+            echo "${NOTES:-Release v${VERSION}}"
+            echo "__EOF__"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Create release
         env:
