@@ -1,7 +1,7 @@
 # Wood Pyrolysis
 
 <p align="center">
-  <img src="wood-pyrolysis_1.0.0/thumbnail.png" width="128" alt="Wood Pyrolysis"/>
+  <img src="assets/thumbnail.png" width="128" alt="Wood Pyrolysis"/>
 </p>
 
 A [Factorio 2.0](https://www.factorio.com/) mod that adds a historically-grounded wood pyrolysis processing chain as an early-game alternative to petroleum.

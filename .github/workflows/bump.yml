@@ -68,7 +68,14 @@ jobs:
             echo "Renamed: $OLD → $NEW"
           fi
 
-      # ── 5. Prepend changelog entry ───────────────────────────────────────────
+      # ── 5. Sync assets/thumbnail.png from mod folder ────────────────────────
+
+      - name: Sync thumbnail to assets
+        run: |
+          cp "${{ steps.current.outputs.new_dir }}/thumbnail.png" assets/thumbnail.png
+          echo "assets/thumbnail.png updated"
+
+      # ── 6. Prepend changelog entry ───────────────────────────────────────────
 
       - name: Update changelog.txt
         run: |
@@ -92,7 +99,7 @@ jobs:
           printf "%b\n" "$NEW_BLOCK" | cat - "$CHANGELOG" > changelog.tmp
           mv changelog.tmp "$CHANGELOG"
 
-      # ── 6. Commit and push to product (triggers publish.yml) ─────────────────
+      # ── 7. Commit and push to product (triggers publish.yml) ─────────────────
 
       - name: Commit and push
         run: |
