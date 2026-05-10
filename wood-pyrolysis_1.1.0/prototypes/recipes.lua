@@ -5,7 +5,7 @@ data:extend({
     icon = "__wood-pyrolysis__/graphics/icons/wood-pyrolysis.png",
     icon_size = 1254,
     category = "wood-pyrolysis-process",
-    enabled = true,
+    enabled = false,
     energy_required = 5,
     ingredients = {
       {type = "item", name = "wood", amount = 10},
@@ -31,7 +31,7 @@ data:extend({
     icon = "__base__/graphics/icons/fluid/light-oil.png",
     icon_size = 64,
     category = "fischer-tropsch-process",
-    enabled = true,
+    enabled = false,
     energy_required = 5,
     ingredients = {
       {type = "fluid", name = "wood-gas", amount = 50},
@@ -57,7 +57,7 @@ data:extend({
     icon = "__base__/graphics/icons/fluid/heavy-oil.png",
     icon_size = 64,
     category = "oil-processing",
-    enabled = true,
+    enabled = false,
     energy_required = 5,
     ingredients = {
       {type = "fluid", name = "pyrolysis-oil", amount = 50},
@@ -83,7 +83,7 @@ data:extend({
     icon = "__base__/graphics/icons/plastic-bar.png",
     icon_size = 64,
     category = "methanol-plastic-process",
-    enabled = true,
+    enabled = false,
     energy_required = 3,
     ingredients = {
       {type = "fluid", name = "methanol", amount = 20},
@@ -108,7 +108,7 @@ data:extend({
     icon = "__wood-pyrolysis__/graphics/icons/methanol-solid-fuel.png",
     icon_size = 96,
     category = "chemistry",
-    enabled = true,
+    enabled = false,
     energy_required = 3,
     ingredients = {
       {type = "fluid", name = "methanol", amount = 50},

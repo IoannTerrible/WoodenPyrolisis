@@ -1,4 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.0
+Date: 2026-05-10
+  Features:
+    - Added Wood Pyrolysis technology — recipes are no longer available from the start.
+    - Tech is gated behind tree-seeding (the Gleba wood-from-seeds research) and requires the same five science packs (automation, logistic, chemical, space, agricultural).
+    - Tech icon uses the Wood Pyrolysis recipe icon.
+    - Unlocks all five mod recipes: Wood Pyrolysis, Fischer-Tropsch Synthesis, Bio-Oil Distillation, Bakelite Synthesis, Methanol-to-Fuel.
+  Locale:
+    - Added Russian (ru), German (de), and Czech (cs) translations for all items, fluids, recipes, and the new technology.
+  Info:
+    - Now requires the Space Age expansion (tree-seeding prerequisite is a Space Age technology).
+---------------------------------------------------------------------------------------------------
 Version: 1.0.1
 Date: 2026-04-27
   Bugfixes:
