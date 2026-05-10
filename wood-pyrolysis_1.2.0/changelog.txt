@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 2026-05-10
+  Locale:
+    - Added French (fr), Spanish (es), Polish (pl), Japanese (ja), and Chinese Simplified (zh-CN) translations.
+  Features:
+    - Added Factoriopedia descriptions for all items, fluids, recipes, and the technology — extra historical context shown in-game in the encyclopedia.
+---------------------------------------------------------------------------------------------------
 Version: 1.1.0
 Date: 2026-05-10
   Features:

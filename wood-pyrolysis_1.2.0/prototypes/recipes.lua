@@ -5,6 +5,7 @@ data:extend({
     icon = "__wood-pyrolysis__/graphics/icons/wood-pyrolysis.png",
     icon_size = 1254,
     category = "wood-pyrolysis-process",
+    factoriopedia_description = {"factoriopedia-description.recipe-wood-pyrolysis"},
     enabled = false,
     energy_required = 5,
     ingredients = {
@@ -31,6 +32,7 @@ data:extend({
     icon = "__base__/graphics/icons/fluid/light-oil.png",
     icon_size = 64,
     category = "fischer-tropsch-process",
+    factoriopedia_description = {"factoriopedia-description.recipe-fischer-tropsch-synthesis"},
     enabled = false,
     energy_required = 5,
     ingredients = {
@@ -57,6 +59,7 @@ data:extend({
     icon = "__base__/graphics/icons/fluid/heavy-oil.png",
     icon_size = 64,
     category = "oil-processing",
+    factoriopedia_description = {"factoriopedia-description.recipe-bio-oil-distillation"},
     enabled = false,
     energy_required = 5,
     ingredients = {
@@ -83,6 +86,7 @@ data:extend({
     icon = "__base__/graphics/icons/plastic-bar.png",
     icon_size = 64,
     category = "methanol-plastic-process",
+    factoriopedia_description = {"factoriopedia-description.recipe-methanol-plastic"},
     enabled = false,
     energy_required = 3,
     ingredients = {
@@ -108,6 +112,7 @@ data:extend({
     icon = "__wood-pyrolysis__/graphics/icons/methanol-solid-fuel.png",
     icon_size = 96,
     category = "chemistry",
+    factoriopedia_description = {"factoriopedia-description.recipe-methanol-solid-fuel"},
     enabled = false,
     energy_required = 3,
     ingredients = {

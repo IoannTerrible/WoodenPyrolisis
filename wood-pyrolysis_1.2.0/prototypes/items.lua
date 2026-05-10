@@ -9,5 +9,6 @@ data:extend({
     stack_size = 100,
     fuel_category = "chemical",
     fuel_value = "4MJ",
+    factoriopedia_description = {"factoriopedia-description.biochar"},
   },
 })

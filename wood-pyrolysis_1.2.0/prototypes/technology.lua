@@ -4,6 +4,7 @@ data:extend({
     name = "wood-pyrolysis",
     icon = "__wood-pyrolysis__/graphics/icons/wood-pyrolysis.png",
     icon_size = 1254,
+    factoriopedia_description = {"factoriopedia-description.tech-wood-pyrolysis"},
     effects = {
       { type = "unlock-recipe", recipe = "wood-pyrolysis" },
       { type = "unlock-recipe", recipe = "fischer-tropsch-synthesis" },

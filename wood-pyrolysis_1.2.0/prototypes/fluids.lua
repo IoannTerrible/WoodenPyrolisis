@@ -10,6 +10,7 @@ data:extend({
     max_temperature = 100,
     base_color = {r = 0.25, g = 0.12, b = 0.03},
     flow_color = {r = 0.45, g = 0.25, b = 0.08},
+    factoriopedia_description = {"factoriopedia-description.pyrolysis-oil"},
   },
   {
     type = "fluid",
@@ -28,6 +29,7 @@ data:extend({
     base_color = {r = 0.42, g = 0.43, b = 0.32},
     flow_color = {r = 0.65, g = 0.67, b = 0.50},
     gas_temperature = 25,
+    factoriopedia_description = {"factoriopedia-description.wood-gas"},
   },
   {
     type = "fluid",
@@ -40,5 +42,6 @@ data:extend({
     max_temperature = 100,
     base_color = {r = 0.90, g = 0.88, b = 0.68},
     flow_color = {r = 1.00, g = 0.98, b = 0.82},
+    factoriopedia_description = {"factoriopedia-description.methanol"},
   },
 })
