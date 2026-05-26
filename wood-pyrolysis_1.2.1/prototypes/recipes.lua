@@ -3,7 +3,7 @@ data:extend({
     type = "recipe",
     name = "wood-pyrolysis",
     icon = "__wood-pyrolysis__/graphics/icons/wood-pyrolysis.png",
-    icon_size = 1254,
+    icon_size = 1024,
     category = "wood-pyrolysis-process",
     factoriopedia_description = {"factoriopedia-description.recipe-wood-pyrolysis"},
     enabled = false,

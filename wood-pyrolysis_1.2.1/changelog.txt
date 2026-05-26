@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.2.1
+Date: 2026-05-26
+  Bugfixes:
+    - Fixed Wood Pyrolysis technology icon rendering as corrupted/pixelated in the research progress popup — image resized from 1254x1254 to 1024x1024 (power of 2) for correct mipmap generation.
+---------------------------------------------------------------------------------------------------
 Version: 1.2.0
 Date: 2026-05-10
   Locale:

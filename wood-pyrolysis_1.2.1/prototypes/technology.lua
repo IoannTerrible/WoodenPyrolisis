@@ -3,7 +3,7 @@ data:extend({
     type = "technology",
     name = "wood-pyrolysis",
     icon = "__wood-pyrolysis__/graphics/icons/wood-pyrolysis.png",
-    icon_size = 1254,
+    icon_size = 1024,
     factoriopedia_description = {"factoriopedia-description.tech-wood-pyrolysis"},
     effects = {
       { type = "unlock-recipe", recipe = "wood-pyrolysis" },
