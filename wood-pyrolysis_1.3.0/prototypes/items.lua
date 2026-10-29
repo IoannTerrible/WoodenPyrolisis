@@ -7,7 +7,7 @@ data:extend({
     subgroup = "raw-resource",
     order = "b[coal]-z[biochar]",
     stack_size = 100,
-    fuel_category = "chemical",
+    fuel_categories = {"chemical"},
     fuel_value = "4MJ",
     factoriopedia_description = {"factoriopedia-description.biochar"},
   },
